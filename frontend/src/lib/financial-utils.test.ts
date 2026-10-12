@@ -58,6 +58,15 @@ describe("computeKPIs", () => {
     const metrics = computeKPIs(onlyOutcomes);
     expect(metrics.profitPercent).toBe(0);
   });
+
+  it("returns zero metrics for an empty movement list", () => {
+    expect(computeKPIs([])).toEqual({
+      totalIncome: 0,
+      totalOutcome: 0,
+      profit: 0,
+      profitPercent: 0,
+    });
+  });
 });
 
 describe("computeMonthlyData", () => {
