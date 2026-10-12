@@ -58,6 +58,15 @@ describe("computeKPIs", () => {
     const metrics = computeKPIs(onlyOutcomes);
     expect(metrics.profitPercent).toBe(0);
   });
+
+  it("returns zero metrics for an empty movement list", () => {
+    expect(computeKPIs([])).toEqual({
+      totalIncome: 0,
+      totalOutcome: 0,
+      profit: 0,
+      profitPercent: 0,
+    });
+  });
 });
 
 describe("computeMonthlyData", () => {
@@ -100,6 +109,59 @@ describe("computeMonthlyData", () => {
       outcome: 0,
       profitPercent: 100,
     });
+  });
+
+  it("returns a negative profit percent when outcomes exceed income", () => {
+    const movements: FinancialMovement[] = [
+      {
+        create_date: "2024-03-10",
+        amount: 400,
+        operation_type: "income",
+        category: "sales",
+        business_type: "B2B",
+      },
+      {
+        create_date: "2024-03-15",
+        amount: 500,
+        operation_type: "outcome",
+        category: "suppliers",
+        business_type: "B2B",
+      },
+    ];
+
+    const monthlyData = computeMonthlyData(movements);
+
+    expect(monthlyData).toEqual([
+      {
+        month: "Mar 2024",
+        income: 400,
+        outcome: 500,
+        profitPercent: -25,
+      },
+    ]);
+  });
+
+  it("returns zero profit percent for outcomes without income", () => {
+    const movements: FinancialMovement[] = [
+      {
+        create_date: "2024-04-15",
+        amount: 200,
+        operation_type: "outcome",
+        category: "operational",
+        business_type: "B2B",
+      },
+    ];
+
+    const monthlyData = computeMonthlyData(movements);
+
+    expect(monthlyData).toEqual([
+      {
+        month: "Apr 2024",
+        income: 0,
+        outcome: 200,
+        profitPercent: 0,
+      },
+    ]);
   });
 });
 
